@@ -45,14 +45,14 @@ sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-backports main restricted u
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 echo "* update, upgrade and dist-upgrade..."
-sudo apt-get -q -y update
-sudo apt-get -q -y upgrade
-sudo apt-get -q -y dist-upgrade
+sudo apt-get -q -y update >/dev/null
+#sudo apt-get -q -y upgrade
+#sudo apt-get -q -y dist-upgrade
 
 echo "* Install deps..."
-sudo apt-get -q -y install wget git sudo make cmake gcc-9 g++-9 tar gzip xz-utils bzip2 gawk sed flex bison || die "* apt basic erro!"
-sudo apt-get -q -y install xserver-xorg-dev:i386 libfreetype6-dev:i386 libfontconfig1-dev:i386 libglu1-mesa-dev:i386 libosmesa6-dev:i386 libvulkan-dev:i386 libvulkan1:i386 libpulse-dev:i386 libopenal-dev:i386 libncurses-dev:i386 libgnutls28-dev:i386 libtiff-dev:i386 libldap-dev:i386 libcapi20-dev:i386 libpcap-dev:i386 libxml2-dev:i386 libmpg123-dev:i386 libgphoto2-dev:i386 libsane-dev:i386 libcupsimage2-dev:i386 libkrb5-dev:i386 libgsm1-dev:i386 libxslt1-dev:i386 libv4l-dev:i386 libgstreamer-plugins-base1.0-dev:i386 libudev-dev:i386 libxi-dev:i386 liblcms2-dev:i386 libibus-1.0-dev:i386 libsdl2-dev:i386 ocl-icd-opencl-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxrandr-dev:i386 libxcomposite-dev:i386 libavcodec57:i386 libavcodec-dev:i386 libswresample2:i386 libswresample-dev:i386 libavutil55:i386 libavutil-dev:i386 libusb-1.0-0-dev:i386 libgcrypt20-dev:i386 libasound2-dev:i386 libjpeg8-dev:i386 libldap2-dev:i386 libx11-dev:i386 zlib1g-dev:i386 libcups2:i386 libdbus-1-3:i386 libicu-dev:i386 libncurses5:i386 || die "* main apt erro!"
-sudo apt-get -q -y purge libvulkan-dev libvulkan1 libsdl2-dev libsdl2-2.0-0 --purge --autoremove || die "* apt purge error!"
+sudo apt-get -q -y install wget git sudo make cmake gcc-9 g++-9 tar gzip xz-utils bzip2 gawk sed flex bison >/dev/null || die "* apt basic erro!"
+sudo apt-get -q -y install xserver-xorg-dev xserver-xorg-dev:i386 libfreetype6-dev libfreetype6-dev:i386 libfontconfig1-dev libfontconfig1-dev:i386 libglu1-mesa-dev libglu1-mesa-dev:i386 libosmesa6-dev libosmesa6-dev:i386 libvulkan-dev libvulkan-dev:i386 libvulkan1 libvulkan1:i386 libpulse-dev libpulse-dev:i386 libopenal-dev libopenal-dev:i386 libncurses-dev libncurses-dev:i386 libgnutls28-dev libgnutls28-dev:i386 libtiff-dev libtiff-dev:i386 libldap-dev libldap-dev:i386 libcapi20-dev libcapi20-dev:i386 libpcap-dev libpcap-dev:i386 libxml2-dev libxml2-dev:i386 libmpg123-dev libmpg123-dev:i386 libgphoto2-dev libgphoto2-dev:i386 libsane-dev libsane-dev:i386 libcupsimage2-dev libcupsimage2-dev:i386 libkrb5-dev libkrb5-dev:i386 libgsm1-dev libgsm1-dev:i386 libxslt1-dev libxslt1-dev:i386 libv4l-dev libv4l-dev:i386 libgstreamer-plugins-base1.0-dev libgstreamer-plugins-base1.0-dev:i386 libudev-dev libudev-dev:i386 libxi-dev libxi-dev:i386 liblcms2-dev liblcms2-dev:i386 libibus-1.0-dev libibus-1.0-dev:i386 libsdl2-dev libsdl2-dev:i386 ocl-icd-opencl-dev ocl-icd-opencl-dev:i386 libxinerama-dev libxinerama-dev:i386 libxcursor-dev libxcursor-dev:i386 libxrandr-dev libxrandr-dev:i386 libxcomposite-dev libxcomposite-dev:i386 libavcodec57 libavcodec57:i386 libavcodec-dev libavcodec-dev:i386 libswresample2 libswresample2:i386 libswresample-dev libswresample-dev:i386 libavutil55 libavutil55:i386 libavutil-dev libavutil-dev:i386 libusb-1.0-0-dev libusb-1.0-0-dev:i386 libgcrypt20-dev libgcrypt20-dev:i386 libasound2-dev libasound2-dev:i386 libjpeg8-dev libjpeg8-dev:i386 libldap2-dev libldap2-dev:i386 libx11-dev libx11-dev:i386 zlib1g-dev zlib1g-dev:i386 libcups2 libcups2:i386 libdbus-1-3 libdbus-1-3:i386 libicu-dev libicu-dev:i386 libncurses5 libncurses5:i386 >/dev/null || die "* main apt erro!"
+sudo apt-get -q -y purge libvulkan-dev libvulkan1 libsdl2-dev libsdl2-2.0-0 --purge --autoremove >/dev/null || die "* apt purge error!"
 # removed  libfaudio0:i386 libfaudio-dev:i386 (building it below), libvkd3d-dev:i386
 
 echo "* compile and install more deps..."
@@ -106,8 +106,6 @@ sudo make install >/dev/null || die "* vkd3d-proton install error!"
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 rm -rf "${WORKDIR}/build_libs"
-
-echo "exiting here for now"; exit 0
 #==============================================================================
 
 echo "* Wine part:"
@@ -152,8 +150,8 @@ rm -r include && rm -r share/applications && rm -r share/man
 #echo "* disabling FileOpenAssociations..."
 #sed 's|    LicenseInformation|    LicenseInformation,\\\n    FileOpenAssociations|g;$a \\n[FileOpenAssociations]\nHKCU,Software\\Wine\\FileOpenAssociations,"Enable",,"N"' ./share/wine/wine.inf -i
 
-echo "* Compressing: wine-dev-${WINE_VERSION}.tar.gz"
-tar czf "${WORKDIR}/wine-dev-${WINE_VERSION}.tar.gz" *
+echo "* Compressing: wine-vanilla-${WINE_VERSION}.tar.gz"
+tar czf "${WORKDIR}/wine-vanilla-${WINE_VERSION}.tar.gz" *
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 mv *.tar.gz result/
