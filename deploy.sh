@@ -1,11 +1,6 @@
 #!/bin/bash
-#export WINE_BUILD_OPTIONS="--without-curses --without-oss --without-mingw --disable-winemenubuilder --disable-win16 --disable-tests"
-# https://github.com/Tk-Glitch/wine-tkg/commits/master
-export TKG_VERSION="5.11"
-#export TKG_VERSION="5.16"
-export TKG_GIT_COMMIT="1aa9bfcd7996262e0b99af941bb719f7efe7bf9e"
-#export TKG_GIT_COMMIT="790da7c7df1c802b912a57c3b798d640f9c1e397"
-export TKG_SRC_FILENAME="wine-tkg-v${TKG_VERSION}-src.tar.gz"
+export WINE_VERSION="5.17"
+export STAGING_VERSION="${WINE_VERSION}"
 export SDL2_VERSION="2.0.12"
 export FAUDIO_VERSION="20.08"
 export VULKAN_VERSION="1.2.145"
@@ -42,22 +37,22 @@ sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-updates main restricted uni
 sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-proposed main restricted universe multiverse" >> /etc/apt/sources.list
 sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-backports main restricted universe multiverse" >> /etc/apt/sources.list
 
-sudo apt-get -q -y update >/dev/null
+sudo apt-get -q -y update
 echo "* Install software-properties-common..."
-sudo apt-get -q -y install software-properties-common apt-utils >/dev/null || die "* apt software-properties-common and apt-utils erro!"
+sudo apt-get -q -y install software-properties-common apt-utils || die "* apt software-properties-common and apt-utils erro!"
 
 # gcc-9 ppa:
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test >/dev/null
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 
 echo "* update, upgrade and dist-upgrade..."
-sudo apt-get -q -y update >/dev/null
-sudo apt-get -q -y upgrade >/dev/null
-sudo apt-get -q -y dist-upgrade >/dev/null
+sudo apt-get -q -y update
+sudo apt-get -q -y upgrade
+sudo apt-get -q -y dist-upgrade
 
 echo "* Install deps..."
-sudo apt-get -q -y install wget git sudo make cmake gcc-9 g++-9 tar gzip xz-utils bzip2 gawk sed flex bison >/dev/null || die "* apt basic erro!"
-sudo apt-get -q -y install xserver-xorg-dev:i386 libfreetype6-dev:i386 libfontconfig1-dev:i386 libglu1-mesa-dev:i386 libosmesa6-dev:i386 libvulkan-dev:i386 libvulkan1:i386 libpulse-dev:i386 libopenal-dev:i386 libncurses-dev:i386 libgnutls28-dev:i386 libtiff-dev:i386 libldap-dev:i386 libcapi20-dev:i386 libpcap-dev:i386 libxml2-dev:i386 libmpg123-dev:i386 libgphoto2-dev:i386 libsane-dev:i386 libcupsimage2-dev:i386 libkrb5-dev:i386 libgsm1-dev:i386 libxslt1-dev:i386 libv4l-dev:i386 libgstreamer-plugins-base1.0-dev:i386 libudev-dev:i386 libxi-dev:i386 liblcms2-dev:i386 libibus-1.0-dev:i386 libsdl2-dev:i386 ocl-icd-opencl-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxrandr-dev:i386 libxcomposite-dev:i386 libavcodec57:i386 libavcodec-dev:i386 libswresample2:i386 libswresample-dev:i386 libavutil55:i386 libavutil-dev:i386 libusb-1.0-0-dev:i386 libgcrypt20-dev:i386 libasound2-dev:i386 libjpeg8-dev:i386 libldap2-dev:i386 libx11-dev:i386 zlib1g-dev:i386 libcups2:i386 libdbus-1-3:i386 libicu-dev:i386 libncurses5:i386 >/dev/null || die "* main apt erro!"
-sudo apt-get -q -y purge libvulkan-dev libvulkan1 libsdl2-dev libsdl2-2.0-0 --purge --autoremove >/dev/null || die "* apt purge error!"
+sudo apt-get -q -y install wget git sudo make cmake gcc-9 g++-9 tar gzip xz-utils bzip2 gawk sed flex bison || die "* apt basic erro!"
+sudo apt-get -q -y install xserver-xorg-dev:i386 libfreetype6-dev:i386 libfontconfig1-dev:i386 libglu1-mesa-dev:i386 libosmesa6-dev:i386 libvulkan-dev:i386 libvulkan1:i386 libpulse-dev:i386 libopenal-dev:i386 libncurses-dev:i386 libgnutls28-dev:i386 libtiff-dev:i386 libldap-dev:i386 libcapi20-dev:i386 libpcap-dev:i386 libxml2-dev:i386 libmpg123-dev:i386 libgphoto2-dev:i386 libsane-dev:i386 libcupsimage2-dev:i386 libkrb5-dev:i386 libgsm1-dev:i386 libxslt1-dev:i386 libv4l-dev:i386 libgstreamer-plugins-base1.0-dev:i386 libudev-dev:i386 libxi-dev:i386 liblcms2-dev:i386 libibus-1.0-dev:i386 libsdl2-dev:i386 ocl-icd-opencl-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxrandr-dev:i386 libxcomposite-dev:i386 libavcodec57:i386 libavcodec-dev:i386 libswresample2:i386 libswresample-dev:i386 libavutil55:i386 libavutil-dev:i386 libusb-1.0-0-dev:i386 libgcrypt20-dev:i386 libasound2-dev:i386 libjpeg8-dev:i386 libldap2-dev:i386 libx11-dev:i386 zlib1g-dev:i386 libcups2:i386 libdbus-1-3:i386 libicu-dev:i386 libncurses5:i386 || die "* main apt erro!"
+sudo apt-get -q -y purge libvulkan-dev libvulkan1 libsdl2-dev libsdl2-2.0-0 --purge --autoremove || die "* apt purge error!"
 # removed  libfaudio0:i386 libfaudio-dev:i386 (building it below), libvkd3d-dev:i386
 
 echo "* compile and install more deps..."
@@ -111,41 +106,41 @@ sudo make install >/dev/null || die "* vkd3d-proton install error!"
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 rm -rf "${WORKDIR}/build_libs"
+
+echo "exiting here for now"; exit 0
 #==============================================================================
 
 echo "* Wine part:"
-echo "* Getting wine source from Tk-Glitch..."
-wget -nv "https://github.com/Tk-Glitch/wine-tkg/archive/${TKG_GIT_COMMIT}.tar.gz" -O "${TKG_SRC_FILENAME}"
-tar xf "${TKG_SRC_FILENAME}" || die "* cant extract wine!"
-mv "wine-tkg-${TKG_GIT_COMMIT}" "wine-src" || die "* cant rename wine-src!"
+echo "* Getting wine source and patch..."
+wget -q "https://dl.winehq.org/wine/source/5.x/wine-${WINE_VERSION}.tar.xz"
+tar xf "wine-${WINE_VERSION}.tar.xz" || die "* cant extract wine!"
+mv "wine-${WINE_VERSION}" "wine-src" || die "* cant rename wine-src!"
 
 #echo "* Applying patchs..."
 
 echo "* Compiling..."
 
-mkdir "wine-tkg64"
-mkdir "wine-tkg32"
-mkdir "wine-tkg"
+mkdir "build64"
+mkdir "build32"
+mkdir "wine-inst"
 
 # compile 64bits first
-cd "${WORKDIR}/wine-tkg64" || die "* Cant enter on the ${WORKDIR}/wine-tkg64 dir!"
-../wine-src/configure --enable-win64 --prefix "${WORKDIR}/wine-tkg" --disable-tests
+cd "${WORKDIR}/build64" || die "* Cant enter on the ${WORKDIR}/build64 dir!"
+../wine-src/configure --enable-win64 --prefix "${WORKDIR}/wine-inst" --disable-tests
 make -j"$(nproc)" --no-print-directory || die "* cant make wine64!"
 
 # compile 32bbits
-cd "${WORKDIR}/wine-tkg32" || die "* Cant enter on the ${WORKDIR}/wine-tkg32 dir!"
-#FIXME: add -with-wine-tools=../build-tools
-# or do instead: PKG_CONFIG_PATH=/path/to/pkgconfig ../wine-source/configure --with-wine64=../wine64-build
-../wine-src/configure --with-wine64=../wine-tkg64 --prefix "${WORKDIR}/wine-tkg" --disable-tests
+cd "${WORKDIR}/build32" || die "* Cant enter on the ${WORKDIR}/build32 dir!"
+PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig:/usr/lib32/pkgconfig" ../wine-src/configure --with-wine64=../build64 --prefix "${WORKDIR}/wine-inst" --disable-tests
 make -j"$(nproc)" --no-print-directory || die "* cant make wine32!"
 
 # install (the 32bits first)
 make install --no-print-directory || die "* cant install wine!"
-cd "${WORKDIR}/wine-tkg64" || die "* Cant enter on the ${WORKDIR}/wine-tkg64 dir!"
+cd "${WORKDIR}/build64" || die "* Cant enter on the ${WORKDIR}/build64 dir!"
 make install --no-print-directory || die "* cant install wine!"
 
 #-------------------------------------------------
-cd "${WORKDIR}/wine-tkg" || die "* Cant enter on the wine-tkg dir!"
+cd "${WORKDIR}/wine-inst" || die "* Cant enter on the wine-inst dir!"
 
 echo "* Cleaning..."
 rm -r include && rm -r share/applications && rm -r share/man
@@ -157,8 +152,8 @@ rm -r include && rm -r share/applications && rm -r share/man
 #echo "* disabling FileOpenAssociations..."
 #sed 's|    LicenseInformation|    LicenseInformation,\\\n    FileOpenAssociations|g;$a \\n[FileOpenAssociations]\nHKCU,Software\\Wine\\FileOpenAssociations,"Enable",,"N"' ./share/wine/wine.inf -i
 
-echo "* Compressing: wine-tkg-${TKG_VERSION}.tar.gz"
-tar czf "${WORKDIR}/wine-tkg-${TKG_VERSION}.tar.gz" *
+echo "* Compressing: wine-dev-${WINE_VERSION}.tar.gz"
+tar czf "${WORKDIR}/wine-dev-${WINE_VERSION}.tar.gz" *
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 mv *.tar.gz result/
