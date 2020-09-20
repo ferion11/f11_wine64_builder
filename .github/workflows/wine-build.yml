@@ -1,0 +1,41 @@
+name: wine-build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Run 1_basic_deps.sh
+      shell: bash
+      run: bash ./1_basic_deps.sh
+
+    - name: Run 2_compile_deps.sh
+      shell: bash
+      run: bash ./2_compile_deps.sh
+
+    - name: Run 3_compile_wine64.sh
+      shell: bash
+      run: bash ./3_compile_wine64.sh
+
+    - name: Run 4_compile_wine32.sh
+      shell: bash
+      run: bash ./4_compile_wine32.sh
+
+    - name: Run 5_install.sh
+      shell: bash
+      run: bash ./5_install.sh
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifact
+        path: *.tar.gz
