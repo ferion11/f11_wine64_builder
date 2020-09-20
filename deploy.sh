@@ -42,7 +42,7 @@ sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-backports main restricted u
 #sudo apt-get -q -y install software-properties-common apt-utils || die "* apt software-properties-common and apt-utils erro!"
 
 # gcc-9 ppa:
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
 echo "* update, upgrade and dist-upgrade..."
 sudo apt-get -q -y update
