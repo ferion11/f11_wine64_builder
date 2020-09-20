@@ -43,7 +43,7 @@ sudo dpkg --add-architecture i386
 #sudo apt-get -q -y install software-properties-common apt-utils || die "* apt software-properties-common and apt-utils erro!"
 
 # gcc-9 ppa:
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test >/dev/null
 
 echo "* update, upgrade and dist-upgrade..."
 sudo apt-get -q -y update >/dev/null
@@ -87,7 +87,7 @@ build_and_install() {
 	cmake ../"$1" >/dev/null
 	make -j"$(nproc)" >/dev/null || die "* Cant make $1!"
 	sudo make install >/dev/null || die "* Cant install $1!"
-	cd ../ && rm -r build
+	cd ../ && sudo rm -r build
 }
 
 build_and_install "SDL2-${SDL2_VERSION}"
@@ -107,7 +107,7 @@ make -j"$(nproc)" >/dev/null || die "* vkd3d-proton make error!"
 sudo make install >/dev/null || die "* vkd3d-proton install error!"
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
-#rm -rf "${WORKDIR}/build_libs"
+sudo rm -rf "${WORKDIR}/build_libs"
 #==============================================================================
 
 echo "* Wine part:"
@@ -143,7 +143,7 @@ make install --no-print-directory || die "* cant install wine!"
 cd "${WORKDIR}/wine-inst" || die "* Cant enter on the wine-inst dir!"
 
 echo "* Cleaning..."
-rm -r include && rm -r share/applications && rm -r share/man
+sudo rm -r include && sudo rm -r share/applications && sudo rm -r share/man
 
 # Will do it on he appimage making only, because one can use this native feature
 #echo "* disabling winemenubuilder.exe..."
