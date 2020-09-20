@@ -37,9 +37,9 @@ sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-updates main restricted uni
 sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-proposed main restricted universe multiverse" >> /etc/apt/sources.list
 sudo echo "deb-src ${CHROOT_MIRROR} ${CHROOT_DISTRO}-backports main restricted universe multiverse" >> /etc/apt/sources.list
 
-sudo apt-get -q -y update
-echo "* Install software-properties-common..."
-sudo apt-get -q -y install software-properties-common apt-utils || die "* apt software-properties-common and apt-utils erro!"
+#sudo apt-get -q -y update
+#echo "* Install software-properties-common..."
+#sudo apt-get -q -y install software-properties-common apt-utils || die "* apt software-properties-common and apt-utils erro!"
 
 # gcc-9 ppa:
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
