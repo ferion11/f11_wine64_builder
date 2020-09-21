@@ -1,4 +1,4 @@
-name: wine-build
+name: wine-build-release
 
 on:
   push:
