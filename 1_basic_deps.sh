@@ -33,7 +33,7 @@ sudo dpkg --add-architecture i386
 # gcc-9 ppa:
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test >/dev/null
 sudo add-apt-repository -y ppa:cybermax-dexter/sdl2-backport >/dev/null
-sudo add-apt-repository -y ppa:mc3man/bionic-media >/dev/nullhttps://dl.winehq.org/wine-builds/ubuntu/dists/bionic/main/source/wine-staging_5.17~bionic.orig.tar.gz
+sudo add-apt-repository -y ppa:mc3man/bionic-media >/dev/null
 sudo add-apt-repository -y ppa:cybermax-dexter/vkd3d >/dev/null
 
 wget -q https://dl.winehq.org/wine-builds/winehq.key
