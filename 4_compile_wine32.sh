@@ -1,9 +1,5 @@
 #!/bin/bash
-
-# nehalem go up to sse4.2
-export CFLAGS="-march=nehalem -O2 -pipe -ftree-vectorize -fno-stack-protector"
-export CXXFLAGS="${CFLAGS}"
-export LDFLAGS="-Wl,-O1,--sort-common,--as-needed"
+source ./0_variables.sh
 #==============================================================================
 
 #=================================================
@@ -25,4 +21,4 @@ PKG_CONFIG_PATH="/usr/lib/i386-linux-gnu/pkgconfig:/usr/lib32/pkgconfig" ../wine
 #make -j"$(nproc)" --no-print-directory || die "* cant make wine32!"
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
-echo "DEBUG EXIT"; exit 1
+echo "DEBUG EXIT!"; exit 1

@@ -1,6 +1,5 @@
 #!/bin/bash
-export CHROOT_DISTRO="bionic"
-export CHROOT_MIRROR="http://archive.ubuntu.com/ubuntu/"
+source ./0_variables.sh
 #==============================================================================
 
 #=================================================

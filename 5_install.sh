@@ -1,11 +1,5 @@
 #!/bin/bash
-export WINE_VERSION="5.17"
-export STAGING_VERSION="${WINE_VERSION}"
-
-# nehalem go up to sse4.2
-export CFLAGS="-march=nehalem -O2 -pipe -ftree-vectorize -fno-stack-protector"
-export CXXFLAGS="${CFLAGS}"
-export LDFLAGS="-Wl,-O1,--sort-common,--as-needed"
+source ./0_variables.sh
 #==============================================================================
 
 #=================================================
