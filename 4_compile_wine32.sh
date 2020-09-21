@@ -14,8 +14,8 @@ cat /etc/issue
 WORKDIR=$(pwd)
 echo "* Working inside ${WORKDIR}"
 
-#change packages to 32bits ones, here:
-sudo apt-get -q -y build-dep libgcrypt20-dev:i386 libtiff-dev:i386 libcupsimage2-dev:i386 libgstreamer-plugins-base1.0-dev:i386 libgnutls28-dev:i386 libxml2:i386 >/dev/null || die "* Error apt-get 32bits!"
+#change packages to 32bits ones, here: >/dev/null
+sudo apt-get -q -y build-dep libgcrypt20-dev:i386 libtiff-dev:i386 libcupsimage2-dev:i386 libgstreamer-plugins-base1.0-dev:i386 libgnutls28-dev:i386 libxml2:i386 || die "* Error apt-get 32bits!"
 
 # compile 32bbits
 cd "${WORKDIR}/build32" || die "* Cant enter on the ${WORKDIR}/build32 dir!"
