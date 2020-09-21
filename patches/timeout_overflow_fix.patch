@@ -1,0 +1,41 @@
+From: Piotr Caban <piotr@codeweavers.com>
+Subject: [PATCH 2/2] server: Don't overflow if timeout doesn't fit into int range in get_next_timeout.
+Message-Id: <0d22f1ef-9184-f7f3-bd60-a034b494dfad@codeweavers.com>
+Date: Sun, 20 Sep 2020 15:59:52 +0200
+
+Signed-off-by: Piotr Caban <piotr@codeweavers.com>
+---
+I'm not aware of any application that depends on this patch (it's only 
+for the sake of correctness).
+
+  server/fd.c | 10 ++++++----
+  1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/server/fd.c b/server/fd.c
+index a88ba39ef01..59db13bae52 100644
+--- a/server/fd.c
++++ b/server/fd.c
+@@ -953,16 +953,18 @@ static int get_next_timeout(void)
+         if ((ptr = list_head( &abs_timeout_list )) != NULL)
+         {
+             struct timeout_user *timeout = LIST_ENTRY( ptr, struct timeout_user, entry );
+-            int diff = (timeout->when - current_time + 9999) / 10000;
+-            if (diff < 0) diff = 0;
++            timeout_t diff = (timeout->when - current_time + 9999) / 10000;
++            if (diff > INT_MAX) diff = INT_MAX;
++            else if (diff < 0) diff = 0;
+             if (ret == -1 || diff < ret) ret = diff;
+         }
+ 
+         if ((ptr = list_head( &rel_timeout_list )) != NULL)
+         {
+             struct timeout_user *timeout = LIST_ENTRY( ptr, struct timeout_user, entry );
+-            int diff = (-timeout->when - monotonic_time + 9999) / 10000;
+-            if (diff < 0) diff = 0;
++            timeout_t diff = (-timeout->when - monotonic_time + 9999) / 10000;
++            if (diff > INT_MAX) diff = INT_MAX;
++            else if (diff < 0) diff = 0;
+             if (ret == -1 || diff < ret) ret = diff;
+         }
+     }
+

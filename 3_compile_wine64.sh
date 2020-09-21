@@ -22,7 +22,11 @@ wget -q "https://dl.winehq.org/wine/source/5.x/wine-${WINE_VERSION}.tar.xz"
 tar xf "wine-${WINE_VERSION}.tar.xz" || die "* cant extract wine!"
 mv "wine-${WINE_VERSION}" "wine-src" || die "* cant rename wine-src!"
 
-#echo "* Applying patchs..."
+echo "* Applying patchs..."
+cd "${WORKDIR}/wine-src" || die "Cant enter on ${WORKDIR}/wine-src dir!"
+patch -p1 < "${WORKDIR}/patches/timeout_infinite_fix.patch" || die "Cant apply the timeout_infinite_fix.patch!"
+patch -p1 < "${WORKDIR}/patches/timeout_overflow_fix.patch" || die "Cant apply the timeout_overflow_fix.patch!"
+cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 
 echo "* Compiling..."
 

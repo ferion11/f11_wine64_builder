@@ -2,9 +2,8 @@ name: wine-build
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -34,8 +33,17 @@ jobs:
       shell: bash
       run: bash ./5_install.sh
 
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2
+    - name: Run md5sum
+      shell: bash
+      run: |
+        mkdir result
+        mv ./*.tar.gz ./result/
+        wget -c https://github.com/ferion11/libsutil/releases/download/md5sum_util_v0.1/md5sum_util.sh
+        bash md5sum_util.sh result
+
+    - name: Release upload
+      uses: marvinpinto/action-automatic-releases@latest
       with:
-        name: my-artifact
-        path: ./*.tar.gz
+        prerelease: false
+        files: ./result/*
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
