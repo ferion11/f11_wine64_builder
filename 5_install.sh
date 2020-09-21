@@ -36,6 +36,8 @@ sudo rm -r include && sudo rm -r share/applications && sudo rm -r share/man
 #echo "* disabling FileOpenAssociations..."
 #sed 's|    LicenseInformation|    LicenseInformation,\\\n    FileOpenAssociations|g;$a \\n[FileOpenAssociations]\nHKCU,Software\\Wine\\FileOpenAssociations,"Enable",,"N"' ./share/wine/wine.inf -i
 
+rm -f "${WORKDIR}"/*.tar.gz
+
 echo "* Compressing: wine-staging-${WINE_VERSION}.tar.gz"
 tar czf "${WORKDIR}/wine-staging-${WINE_VERSION}.tar.gz" *
 
