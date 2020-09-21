@@ -40,10 +40,10 @@ wget -q https://dl.winehq.org/wine-builds/winehq.key
 sudo apt-key add winehq.key
 sudo add-apt-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ bionic main'
 
-echo "* update, upgrade and dist-upgrade..."
+echo "* apt-get update"
 sudo apt-get -q -y update >/dev/null
-sudo apt-get -q -y upgrade
-#sudo apt-get -q -y dist-upgrade
+##sudo apt-get -q -y upgrade
+##sudo apt-get -q -y dist-upgrade
 
 echo "* Install deps..."
 sudo apt-get -q -y install wget git sudo make cmake gcc-multilib g++-multilib tar gzip xz-utils bzip2 gawk sed flex bison || die "* apt basic erro!"
