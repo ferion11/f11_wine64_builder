@@ -1,4 +1,8 @@
 #!/bin/bash
+# amd64 or i386
+export UBUNTU_ARCH=amd64
+#export UBUNTU_ARCH=${1}
+
 export SDL2_VERSION="2.0.12"
 export FAUDIO_VERSION="20.08"
 export VULKAN_VERSION="1.2.145"
@@ -61,8 +65,8 @@ build_and_install "Vulkan-Loader-${VULKAN_VERSION}"
 build_and_install "SPIRV-Headers-${SPIRV_VERSION}"
 # Need libvkd3d-dev package that refuse to install on ${CHROOT_DISTRO}, so workaround:
 echo "* compiling and install vkd3d-proton>"
-wget -q https://dl.winehq.org/wine-builds/ubuntu/dists/${CHROOT_DISTRO}/main/binary-amd64/wine-stable_5.0.2~${CHROOT_DISTRO}_amd64.deb
-dpkg -x wine-stable_5.0.2~${CHROOT_DISTRO}_amd64.deb ./
+wget -q https://dl.winehq.org/wine-builds/ubuntu/dists/${CHROOT_DISTRO}/main/binary-${UBUNTU_ARCH}/wine-stable_5.0.2~${CHROOT_DISTRO}_${UBUNTU_ARCH}.deb
+dpkg -x wine-stable_5.0.2~${CHROOT_DISTRO}_${UBUNTU_ARCH}.deb ./
 sudo cp ./opt/wine-stable/bin/widl /usr/bin/ || die "cant copy widl erro!"
 cd vkd3d-proton || die "* Cant enter on vkd3d-proton dir!"
 ./autogen.sh >/dev/null
