@@ -33,6 +33,8 @@ sudo dpkg --add-architecture i386
 # gcc-9 ppa:
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test >/dev/null
 sudo add-apt-repository -y ppa:cybermax-dexter/sdl2-backport >/dev/null
+sudo add-apt-repository -y ppa:mc3man/bionic-media >/dev/null
+sudo add-apt-repository -y ppa:cybermax-dexter/vkd3d >/dev/null
 
 echo "* update, upgrade and dist-upgrade..."
 sudo apt-get -q -y update >/dev/null
