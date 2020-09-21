@@ -1,6 +1,4 @@
 #!/bin/bash
-#export WINE_VERSION="5.17"
-#export STAGING_VERSION="${WINE_VERSION}.2"
 export WINE_VERSION="5.11"
 export STAGING_VERSION="${WINE_VERSION}"
 
