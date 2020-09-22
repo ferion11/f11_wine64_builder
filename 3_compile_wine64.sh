@@ -34,6 +34,6 @@ mkdir "wine-inst"
 # compile 64bits first
 cd "${WORKDIR}/build64" || die "* Cant enter on the ${WORKDIR}/build64 dir!"
 ../wine-src/configure --enable-win64 --prefix "${WORKDIR}/wine-inst" --disable-tests
-#make -j"$(nproc)" --no-print-directory || die "* cant make wine64!"
+make -j"$(nproc)" --no-print-directory || die "* cant make wine64!"
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
