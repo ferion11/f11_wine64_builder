@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - 'master'
-      - 'last'
+      - 'tkg64'
   pull_request:
     branches:
       - 'master'
-      - 'last'
+      - 'tkg64'
 
 jobs:
   build:

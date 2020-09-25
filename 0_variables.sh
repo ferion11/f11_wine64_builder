@@ -1,6 +1,8 @@
 #!/bin/bash
 export WINE_VERSION="5.17"
 export STAGING_VERSION="${WINE_VERSION}.2"
+export TKG_GIT_COMMIT="4793345595e4bf53abf108f0827ca1ba99de8908"
+export TKG_SRC_FILENAME="wine-tkg-v${WINE_VERSION}-src.tar.gz"
 
 export SDL2_VERSION="2.0.12"
 export FAUDIO_VERSION="20.08"
