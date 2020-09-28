@@ -1,7 +1,7 @@
 #!/bin/bash
-export WINE_VERSION="5.17"
-export STAGING_VERSION="${WINE_VERSION}.2"
-export TKG_GIT_COMMIT="4793345595e4bf53abf108f0827ca1ba99de8908"
+export WINE_VERSION="5.18"
+export STAGING_VERSION="${WINE_VERSION}"
+export TKG_GIT_COMMIT="8cb2d6edbf136b8698ad8a8234d6faed825582ae"
 export TKG_SRC_FILENAME="wine-tkg-v${WINE_VERSION}-src.tar.gz"
 
 export SDL2_VERSION="2.0.12"
@@ -16,7 +16,7 @@ export CHROOT_MIRROR="http://archive.ubuntu.com/ubuntu/"
 # amd64 or i386
 export UBUNTU_ARCH=amd64
 
-# nehalem go up to sse4.2
+# nehalem go up to sse4.2https://github.com/Frogging-Family/wine-tkg-git/releases/tag/5.18.r3.g9acfa3b8
 export CFLAGS="-march=nehalem -O2 -pipe -ftree-vectorize -fno-stack-protector"
 export CXXFLAGS="${CFLAGS}"
 export LDFLAGS="-Wl,-O1,--sort-common,--as-needed"
