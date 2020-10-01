@@ -28,8 +28,8 @@ mv "wine-${WINE_HASH}" "wine-src" || die "* cant rename wine-src!"
 #echo "* Applying patchs..."
 #"./wine-staging-${STAGING_VERSION}/patches/patchinstall.sh" DESTDIR="${WORKDIR}/wine-src" --all >"${WORKDIR}/staging_patches.txt" || die "* Cant apply the wine-staging patches!"
 cd "${WORKDIR}/wine-src" || die "Cant enter on ${WORKDIR}/wine-src dir!"
-HAVE_TIMEOUT_PATCHE="$(cat server/timer.c | grep TIMEOUT_INFINITE)"
-if [ -z "${HAVE_TIMEOUT_PATCHE}" ]; then
+HAVE_TIMEOUT_PATCH="$(cat server/timer.c | grep TIMEOUT_INFINITE)"
+if [ -z "${HAVE_TIMEOUT_PATCH}" ]; then
 	echo "* Applying timeout_infinite_fix.patch..."
 	patch -p1 < "${WORKDIR}/patches/timeout_infinite_fix.patch" || die "Cant apply the timeout_infinite_fix.patch!"
 fi
