@@ -1,10 +1,10 @@
 #!/bin/bash
-export WINE_VERSION="5.17"
-## using source from: https://github.com/wine-mirror/wine
-## step 0
-#export WINE_HASH="4826900a30a431faa8bcc9e3f0007f794d8d15bb"
-#export WINE_VERSION="$(echo "${WINE_HASH}" | cut -c1-7)"
-#export STAGING_VERSION="${WINE_VERSION}"
+#export WINE_VERSION="5.17"
+# using source from: https://github.com/wine-mirror/wine
+# step 1
+export WINE_HASH="c460d4ff35e69052a917a8d75f97f39d36747e52"
+export WINE_VERSION="$(echo "${WINE_HASH}" | cut -c1-7)"
+export STAGING_VERSION="${WINE_VERSION}"
 
 export SDL2_VERSION="2.0.12"
 export FAUDIO_VERSION="20.08"
