@@ -33,6 +33,8 @@ if [ -z "${HAVE_TIMEOUT_PATCH}" ]; then
 	echo "* Applying timeout_infinite_fix.patch..."
 	patch -p1 < "${WORKDIR}/patches/timeout_infinite_fix.patch" || die "Cant apply the timeout_infinite_fix.patch!"
 fi
+echo "* Applying revert_d28c793.patch..."
+patch -p1 < "${WORKDIR}/patches/revert_d28c793.patch" || die "Cant apply the revert_d28c793.patch!"
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 
 
