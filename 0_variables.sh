@@ -1,8 +1,8 @@
 #!/bin/bash
 #export WINE_VERSION="5.17"
 # using source from: https://github.com/wine-mirror/wine
-# last git 2020/10/02 12h:03m
-export WINE_HASH="fa9f4a20f5305b7cbcfe3a644d39d4b759f89203"
+# test 5.18 with the revert patch too (should be bad)
+export WINE_HASH="9a6e5b23293fbad3bbdcd52007402a3b9a1cb99d"
 export WINE_VERSION="$(echo "${WINE_HASH}" | cut -c1-7)"
 export STAGING_VERSION="${WINE_VERSION}"
 
