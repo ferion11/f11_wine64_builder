@@ -3,8 +3,8 @@
 # using source from: https://github.com/wine-mirror/wine
 # ref with the patch, bad 5.18 d28c7938c704fe4dcfc8920db494a7175a46fe6b
 # ref with the patch, good d28c7938c704fe4dcfc8920db494a7175a46fe6b
-# with patch test 5.1
-export WINE_HASH="6d7037c9ff1219ae959e365d8a95a3fceb57ca87"
+# with patch test 6
+export WINE_HASH="0957f9302ca40bd85e092ed335d3fd10ab9bf4da"
 export WINE_VERSION="$(echo "${WINE_HASH}" | cut -c1-7)"
 export STAGING_VERSION="${WINE_VERSION}"
 
