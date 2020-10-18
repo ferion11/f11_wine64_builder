@@ -10,6 +10,11 @@ cat /etc/issue
 WORKDIR=$(pwd)
 echo "* Working inside ${WORKDIR}"
 
+echo "* Download and install ccache from file:"
+wget -q https://github.com/ferion11/f11_wine64_builder/releases/download/continuous-test/ccache.tar.gz  || echo "can not download ccache.tar.gz, but keep going..."
+tar xf ccache.tar.gz || echo "can not extract ccache.tar.gz, but keep going..."
+
+
 echo "* compile and install more deps..."
 mkdir "${WORKDIR}/build_libs"
 cd "${WORKDIR}/build_libs" || die "* Cant enter on dir build_libs!"

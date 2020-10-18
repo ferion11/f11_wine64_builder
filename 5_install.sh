@@ -36,5 +36,9 @@ echo "* Compressing: wine-vanilla-${WINE_VERSION}.tar.gz"
 tar czf "${WORKDIR}/wine-vanilla-${WINE_VERSION}.tar.gz" *
 
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
+
+echo "* Compressing: ccache.tar.gz"
+tar czf "${WORKDIR}/ccache.tar.gz" ccache
+
 #mv *.tar.gz result/
 #-------------------------------------------------
