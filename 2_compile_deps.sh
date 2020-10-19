@@ -14,6 +14,11 @@ echo "* Download and install ccache from file:"
 wget -q https://github.com/ferion11/f11_wine64_builder/releases/download/continuous-test/ccache.tar.gz  || echo "can not download ccache.tar.gz, but keep going..."
 tar xf ccache.tar.gz || echo "can not extract ccache.tar.gz, but keep going..."
 
+#-------------------------------------------------
+# avoid issue with CMAKE in some sources:
+export CC="gcc"
+export CROSSCC="i686-w64-mingw32-gcc"
+#-------------------------------------------------
 
 echo "* compile and install more deps..."
 mkdir "${WORKDIR}/build_libs"
