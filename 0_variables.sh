@@ -29,4 +29,4 @@ export LDFLAGS="-Wl,-O1,--sort-common,--as-needed"
 WORKDIR=$(pwd)
 export CCACHE_DIR="${WORKDIR}/ccache"
 export CC="ccache gcc"
-export CROSSCC="ccache i686-w64-mingw32-gcc"
+#export CROSSCC="ccache i686-w64-mingw32-gcc"
