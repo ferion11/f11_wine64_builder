@@ -1,0 +1,77 @@
+From 9c8dce215512ac42ed657ce0dd6681712a4c29c3 Mon Sep 17 00:00:00 2001
+From: Alexandre Julliard <julliard@winehq.org>
+Date: Tue, 22 Sep 2020 11:28:41 +0200
+Subject: [PATCH 1/1] ntdll: Don't lock mutexes during process exit.
+
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+---
+ dlls/ntdll/unix/process.c      | 5 ++---
+ dlls/ntdll/unix/server.c       | 1 +
+ dlls/ntdll/unix/unix_private.h | 5 +++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/dlls/ntdll/unix/process.c b/dlls/ntdll/unix/process.c
+index 64380aba036..3e0bd02a59b 100644
+--- a/dlls/ntdll/unix/process.c
++++ b/dlls/ntdll/unix/process.c
+@@ -1042,7 +1042,6 @@ done:
+  */
+ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
+ {
+-    static BOOL clean_exit;
+     NTSTATUS ret;
+     BOOL self;
+ 
+@@ -1056,8 +1055,8 @@ NTSTATUS WINAPI NtTerminateProcess( HANDLE handle, LONG exit_code )
+     SERVER_END_REQ;
+     if (self)
+     {
+-        if (!handle) clean_exit = TRUE;
+-        else if (clean_exit) exit_process( exit_code );
++        if (!handle) process_exiting = TRUE;
++        else if (process_exiting) exit_process( exit_code );
+         else abort_process( exit_code );
+     }
+     return ret;
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index b9ec66537aa..81a903ca77a 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -105,6 +105,7 @@ static const char *server_dir;
+ 
+ unsigned int server_cpus = 0;
+ BOOL is_wow64 = FALSE;
++BOOL process_exiting = FALSE;
+ 
+ timeout_t server_start_time = 0;  /* time of server startup */
+ 
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index c737a3a842f..3d9dca3c51d 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -132,6 +132,7 @@ extern char **main_envp DECLSPEC_HIDDEN;
+ extern WCHAR **main_wargv DECLSPEC_HIDDEN;
+ extern unsigned int server_cpus DECLSPEC_HIDDEN;
+ extern BOOL is_wow64 DECLSPEC_HIDDEN;
++extern BOOL process_exiting DECLSPEC_HIDDEN;
+ extern HANDLE keyed_event DECLSPEC_HIDDEN;
+ extern timeout_t server_start_time DECLSPEC_HIDDEN;
+ extern sigset_t server_block_set DECLSPEC_HIDDEN;
+@@ -280,12 +281,12 @@ static inline void *get_signal_stack(void)
+ 
+ static inline void mutex_lock( pthread_mutex_t *mutex )
+ {
+-    pthread_mutex_lock( mutex );
++    if (!process_exiting) pthread_mutex_lock( mutex );
+ }
+ 
+ static inline void mutex_unlock( pthread_mutex_t *mutex )
+ {
+-    pthread_mutex_unlock( mutex );
++    if (!process_exiting) pthread_mutex_unlock( mutex );
+ }
+ 
+ #ifndef _WIN64
+-- 
+2.20.1
+

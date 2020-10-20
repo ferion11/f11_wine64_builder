@@ -1,0 +1,464 @@
+From d8f7d5457355cd226f0490d849dcd7a34d5f82f0 Mon Sep 17 00:00:00 2001
+From: Alexandre Julliard <julliard@winehq.org>
+Date: Tue, 22 Sep 2020 11:28:25 +0200
+Subject: [PATCH 1/1] ntdll: Add inline wrappers for pthread mutex locking.
+
+Signed-off-by: Alexandre Julliard <julliard@winehq.org>
+---
+ dlls/ntdll/unix/cdrom.c        | 24 ++++++++++----------
+ dlls/ntdll/unix/file.c         | 40 +++++++++++++++++-----------------
+ dlls/ntdll/unix/server.c       |  6 ++---
+ dlls/ntdll/unix/sync.c         | 12 +++++-----
+ dlls/ntdll/unix/system.c       |  6 ++---
+ dlls/ntdll/unix/unix_private.h | 10 +++++++++
+ dlls/ntdll/unix/virtual.c      |  8 +++----
+ 7 files changed, 58 insertions(+), 48 deletions(-)
+
+diff --git a/dlls/ntdll/unix/cdrom.c b/dlls/ntdll/unix/cdrom.c
+index 0d8b624308e..479d4058068 100644
+--- a/dlls/ntdll/unix/cdrom.c
++++ b/dlls/ntdll/unix/cdrom.c
+@@ -559,9 +559,9 @@ static NTSTATUS CDROM_SyncCache(int dev, int fd)
+ 
+ static void CDROM_ClearCacheEntry(int dev)
+ {
+-    pthread_mutex_lock( &cache_mutex );
++    mutex_lock( &cache_mutex );
+     cdrom_cache[dev].toc_good = 0;
+-    pthread_mutex_unlock( &cache_mutex );
++    mutex_unlock( &cache_mutex );
+ }
+ 
+ 
+@@ -667,7 +667,7 @@ static NTSTATUS CDROM_Open(int fd, int* dev)
+ 
+     if (fstat(fd, &st) == -1) return errno_to_status( errno );
+ 
+-    pthread_mutex_lock( &cache_mutex );
++    mutex_lock( &cache_mutex );
+     for (*dev = 0; *dev < MAX_CACHE_ENTRIES; (*dev)++)
+     {
+         if (empty == -1 &&
+@@ -688,7 +688,7 @@ static NTSTATUS CDROM_Open(int fd, int* dev)
+             cdrom_cache[*dev].inode   = st.st_ino;
+         }
+     }
+-    pthread_mutex_unlock( &cache_mutex );
++    mutex_unlock( &cache_mutex );
+ 
+     TRACE("%d, %d\n", *dev, fd);
+     return ret;
+@@ -840,13 +840,13 @@ static NTSTATUS CDROM_ReadTOC(int dev, int fd, CDROM_TOC* toc)
+     if (dev < 0 || dev >= MAX_CACHE_ENTRIES)
+         return STATUS_INVALID_PARAMETER;
+ 
+-    pthread_mutex_lock( &cache_mutex );
++    mutex_lock( &cache_mutex );
+     if (cdrom_cache[dev].toc_good || !(ret = CDROM_SyncCache(dev, fd)))
+     {
+         *toc = cdrom_cache[dev].toc;
+         ret = STATUS_SUCCESS;
+     }
+-    pthread_mutex_unlock( &cache_mutex );
++    mutex_unlock( &cache_mutex );
+     return ret;
+ }
+ 
+@@ -926,7 +926,7 @@ static NTSTATUS CDROM_ReadQChannel(int dev, int fd, const CDROM_SUB_Q_DATA_FORMA
+     switch (fmt->Format)
+     {
+     case IOCTL_CDROM_CURRENT_POSITION:
+-        pthread_mutex_lock( &cache_mutex );
++        mutex_lock( &cache_mutex );
+ 	if (hdr->AudioStatus==AUDIO_STATUS_IN_PROGRESS) {
+           data->CurrentPosition.FormatCode = IOCTL_CDROM_CURRENT_POSITION;
+           data->CurrentPosition.Control = sc.cdsc_ctrl;
+@@ -951,7 +951,7 @@ static NTSTATUS CDROM_ReadQChannel(int dev, int fd, const CDROM_SUB_Q_DATA_FORMA
+ 	  cdrom_cache[dev].CurrentPosition.Header = *hdr; /* Preserve header info */
+ 	  data->CurrentPosition = cdrom_cache[dev].CurrentPosition;
+ 	}
+-        pthread_mutex_unlock( &cache_mutex );
++        mutex_unlock( &cache_mutex );
+         break;
+     case IOCTL_CDROM_MEDIA_CATALOG:
+         data->MediaCatalog.FormatCode = IOCTL_CDROM_MEDIA_CATALOG;
+@@ -1037,7 +1037,7 @@ static NTSTATUS CDROM_ReadQChannel(int dev, int fd, const CDROM_SUB_Q_DATA_FORMA
+     switch (fmt->Format)
+     {
+     case IOCTL_CDROM_CURRENT_POSITION:
+-        pthread_mutex_lock( &cache_mutex );
++        mutex_lock( &cache_mutex );
+ 	if (hdr->AudioStatus==AUDIO_STATUS_IN_PROGRESS) {
+           data->CurrentPosition.FormatCode = IOCTL_CDROM_CURRENT_POSITION;
+           data->CurrentPosition.Control = sc.what.position.control;
+@@ -1059,7 +1059,7 @@ static NTSTATUS CDROM_ReadQChannel(int dev, int fd, const CDROM_SUB_Q_DATA_FORMA
+ 	  cdrom_cache[dev].CurrentPosition.Header = *hdr; /* Preserve header info */
+ 	  data->CurrentPosition = cdrom_cache[dev].CurrentPosition;
+ 	}
+-        pthread_mutex_unlock( &cache_mutex );
++        mutex_unlock( &cache_mutex );
+         break;
+     case IOCTL_CDROM_MEDIA_CATALOG:
+         data->MediaCatalog.FormatCode = IOCTL_CDROM_MEDIA_CATALOG;
+@@ -1248,7 +1248,7 @@ static NTSTATUS CDROM_SeekAudioMSF(int dev, int fd, const CDROM_SEEK_AUDIO_MSF*
+     if (i <= toc.FirstTrack || i > toc.LastTrack+1)
+       return STATUS_INVALID_PARAMETER;
+     i--;
+-    pthread_mutex_lock( &cache_mutex );
++    mutex_lock( &cache_mutex );
+     cp = &cdrom_cache[dev].CurrentPosition;
+     cp->FormatCode = IOCTL_CDROM_CURRENT_POSITION;
+     cp->Control = toc.TrackData[i-toc.FirstTrack].Control;
+@@ -1262,7 +1262,7 @@ static NTSTATUS CDROM_SeekAudioMSF(int dev, int fd, const CDROM_SEEK_AUDIO_MSF*
+     frame -= FRAME_OF_TOC(toc,i);
+     cp->TrackRelativeAddress[0] = 0;
+     MSF_OF_FRAME(cp->TrackRelativeAddress[1], frame);
+-    pthread_mutex_unlock( &cache_mutex );
++    mutex_unlock( &cache_mutex );
+ 
+     /* If playing, then issue a seek command, otherwise do nothing */
+ #ifdef linux
+diff --git a/dlls/ntdll/unix/file.c b/dlls/ntdll/unix/file.c
+index 03e92a5c59e..afb552be098 100644
+--- a/dlls/ntdll/unix/file.c
++++ b/dlls/ntdll/unix/file.c
+@@ -764,7 +764,7 @@ static char *get_default_drive_device( const char *root )
+     if (res == -1) res = stat( root, &st );
+     if (res == -1) return NULL;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+ #ifdef __ANDROID__
+     if ((f = fopen( "/proc/mounts", "r" )))
+@@ -786,7 +786,7 @@ static char *get_default_drive_device( const char *root )
+     }
+ #endif
+     if (device) ret = strdup( device );
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ 
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__ ) || defined(__DragonFly__)
+     char *device = NULL;
+@@ -803,14 +803,14 @@ static char *get_default_drive_device( const char *root )
+     if (res == -1) res = stat( root, &st );
+     if (res == -1) return NULL;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+     /* The FreeBSD parse_mount_entries doesn't require a file argument, so just
+      * pass NULL.  Leave the argument in for symmetry.
+      */
+     device = parse_mount_entries( NULL, st.st_dev, st.st_ino );
+     if (device) ret = strdup( device );
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ 
+ #elif defined( sun )
+     FILE *f;
+@@ -828,7 +828,7 @@ static char *get_default_drive_device( const char *root )
+     if (res == -1) res = stat( root, &st );
+     if (res == -1) return NULL;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+     if ((f = fopen( "/etc/mnttab", "r" )))
+     {
+@@ -842,7 +842,7 @@ static char *get_default_drive_device( const char *root )
+         fclose( f );
+     }
+     if (device) ret = strdup( device );
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ 
+ #elif defined(__APPLE__)
+     struct statfs *mntStat;
+@@ -860,7 +860,7 @@ static char *get_default_drive_device( const char *root )
+     dev = st.st_dev;
+     ino = st.st_ino;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+     mntSize = getmntinfo(&mntStat, MNT_NOWAIT);
+ 
+@@ -881,7 +881,7 @@ static char *get_default_drive_device( const char *root )
+             }
+         }
+     }
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ #else
+     static int warned;
+     if (!warned++) FIXME( "auto detection of DOS devices not supported on this platform\n" );
+@@ -902,7 +902,7 @@ static char *get_device_mount_point( dev_t dev )
+ #ifdef linux
+     FILE *f;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+ #ifdef __ANDROID__
+     if ((f = fopen( "/proc/mounts", "r" )))
+@@ -949,13 +949,13 @@ static char *get_device_mount_point( dev_t dev )
+         }
+         fclose( f );
+     }
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ #elif defined(__APPLE__)
+     struct statfs *entry;
+     struct stat st;
+     int i, size;
+ 
+-    pthread_mutex_lock( &mnt_mutex );
++    mutex_lock( &mnt_mutex );
+ 
+     size = getmntinfo( &entry, MNT_NOWAIT );
+     for (i = 0; i < size; i++)
+@@ -967,7 +967,7 @@ static char *get_device_mount_point( dev_t dev )
+             break;
+         }
+     }
+-    pthread_mutex_unlock( &mnt_mutex );
++    mutex_unlock( &mnt_mutex );
+ #else
+     static int warned;
+     if (!warned++) FIXME( "unmounting devices not supported on this platform\n" );
+@@ -1851,7 +1851,7 @@ static unsigned int get_drives_info( struct file_identity info[MAX_DOS_DRIVES] )
+     unsigned int ret;
+     time_t now = time(NULL);
+ 
+-    pthread_mutex_lock( &cache_mutex );
++    mutex_lock( &cache_mutex );
+     if (now != last_update)
+     {
+         char *buffer, *p;
+@@ -1885,7 +1885,7 @@ static unsigned int get_drives_info( struct file_identity info[MAX_DOS_DRIVES] )
+     }
+     memcpy( info, cache, sizeof(cache) );
+     ret = nb_drives;
+-    pthread_mutex_unlock( &cache_mutex );
++    mutex_unlock( &cache_mutex );
+     return ret;
+ }
+ 
+@@ -2429,7 +2429,7 @@ NTSTATUS WINAPI NtQueryDirectoryFile( HANDLE handle, HANDLE event, PIO_APC_ROUTI
+ 
+     io->Information = 0;
+ 
+-    pthread_mutex_lock( &dir_mutex );
++    mutex_lock( &dir_mutex );
+ 
+     cwd = open( ".", O_RDONLY );
+     if (fchdir( fd ) != -1)
+@@ -2456,7 +2456,7 @@ NTSTATUS WINAPI NtQueryDirectoryFile( HANDLE handle, HANDLE event, PIO_APC_ROUTI
+     }
+     else status = errno_to_status( errno );
+ 
+-    pthread_mutex_unlock( &dir_mutex );
++    mutex_unlock( &dir_mutex );
+ 
+     if (needs_close) close( fd );
+     if (cwd != -1) close( cwd );
+@@ -3012,7 +3012,7 @@ static NTSTATUS file_id_to_unix_file_name( const OBJECT_ATTRIBUTES *attr, char *
+         goto done;
+     }
+ 
+-    pthread_mutex_lock( &dir_mutex );
++    mutex_lock( &dir_mutex );
+     if ((old_cwd = open( ".", O_RDONLY )) != -1 && fchdir( root_fd ) != -1)
+     {
+         /* shortcut for ".." */
+@@ -3033,7 +3033,7 @@ static NTSTATUS file_id_to_unix_file_name( const OBJECT_ATTRIBUTES *attr, char *
+         if (fchdir( old_cwd ) == -1) chdir( "/" );
+     }
+     else status = errno_to_status( errno );
+-    pthread_mutex_unlock( &dir_mutex );
++    mutex_unlock( &dir_mutex );
+     if (old_cwd != -1) close( old_cwd );
+ 
+ done:
+@@ -3208,7 +3208,7 @@ static NTSTATUS nt_to_unix_file_name_attr( const OBJECT_ATTRIBUTES *attr, char *
+         }
+         else
+         {
+-            pthread_mutex_lock( &dir_mutex );
++            mutex_lock( &dir_mutex );
+             if ((old_cwd = open( ".", O_RDONLY )) != -1 && fchdir( root_fd ) != -1)
+             {
+                 status = lookup_unix_name( name, name_len, &unix_name, unix_len, 1,
+@@ -3216,7 +3216,7 @@ static NTSTATUS nt_to_unix_file_name_attr( const OBJECT_ATTRIBUTES *attr, char *
+                 if (fchdir( old_cwd ) == -1) chdir( "/" );
+             }
+             else status = errno_to_status( errno );
+-            pthread_mutex_unlock( &dir_mutex );
++            mutex_unlock( &dir_mutex );
+             if (old_cwd != -1) close( old_cwd );
+             if (needs_close) close( root_fd );
+         }
+diff --git a/dlls/ntdll/unix/server.c b/dlls/ntdll/unix/server.c
+index f1625722641..b9ec66537aa 100644
+--- a/dlls/ntdll/unix/server.c
++++ b/dlls/ntdll/unix/server.c
+@@ -297,7 +297,7 @@ unsigned int CDECL wine_server_call( void *req_ptr )
+ void server_enter_uninterrupted_section( pthread_mutex_t *mutex, sigset_t *sigset )
+ {
+     pthread_sigmask( SIG_BLOCK, &server_block_set, sigset );
+-    pthread_mutex_lock( mutex );
++    mutex_lock( mutex );
+ }
+ 
+ 
+@@ -306,7 +306,7 @@ void server_enter_uninterrupted_section( pthread_mutex_t *mutex, sigset_t *sigse
+  */
+ void server_leave_uninterrupted_section( pthread_mutex_t *mutex, sigset_t *sigset )
+ {
+-    pthread_mutex_unlock( mutex );
++    mutex_unlock( mutex );
+     pthread_sigmask( SIG_SETMASK, sigset, NULL );
+ }
+ 
+@@ -646,7 +646,7 @@ unsigned int server_select( const select_op_t *select_op, data_size_t size, UINT
+         pthread_sigmask( SIG_SETMASK, &old_set, NULL );
+         if (mutex)
+         {
+-            pthread_mutex_unlock( mutex );
++            mutex_unlock( mutex );
+             mutex = NULL;
+         }
+         if (ret != STATUS_PENDING) break;
+diff --git a/dlls/ntdll/unix/sync.c b/dlls/ntdll/unix/sync.c
+index 2d027b83f4a..bba7af7e34f 100644
+--- a/dlls/ntdll/unix/sync.c
++++ b/dlls/ntdll/unix/sync.c
+@@ -2663,10 +2663,10 @@ NTSTATUS WINAPI RtlWaitOnAddress( const void *addr, const void *cmp, SIZE_T size
+     if ((ret = fast_wait_addr( addr, cmp, size, timeout )) != STATUS_NOT_IMPLEMENTED)
+         return ret;
+ 
+-    pthread_mutex_lock( &addr_mutex );
++    mutex_lock( &addr_mutex );
+     if (!compare_addr( addr, cmp, size ))
+     {
+-        pthread_mutex_unlock( &addr_mutex );
++        mutex_unlock( &addr_mutex );
+         return STATUS_SUCCESS;
+     }
+ 
+@@ -2693,9 +2693,9 @@ void WINAPI RtlWakeAddressAll( const void *addr )
+ {
+     if (fast_wake_addr( addr ) != STATUS_NOT_IMPLEMENTED) return;
+ 
+-    pthread_mutex_lock( &addr_mutex );
++    mutex_lock( &addr_mutex );
+     while (NtReleaseKeyedEvent( 0, addr, 0, &zero_timeout ) == STATUS_SUCCESS) {}
+-    pthread_mutex_unlock( &addr_mutex );
++    mutex_unlock( &addr_mutex );
+ }
+ 
+ /***********************************************************************
+@@ -2705,7 +2705,7 @@ void WINAPI RtlWakeAddressSingle( const void *addr )
+ {
+     if (fast_wake_addr( addr ) != STATUS_NOT_IMPLEMENTED) return;
+ 
+-    pthread_mutex_lock( &addr_mutex );
++    mutex_lock( &addr_mutex );
+     NtReleaseKeyedEvent( 0, addr, 0, &zero_timeout );
+-    pthread_mutex_unlock( &addr_mutex );
++    mutex_unlock( &addr_mutex );
+ }
+diff --git a/dlls/ntdll/unix/system.c b/dlls/ntdll/unix/system.c
+index ccbc68b972d..b85a3c7b6ad 100644
+--- a/dlls/ntdll/unix/system.c
++++ b/dlls/ntdll/unix/system.c
+@@ -1929,7 +1929,7 @@ static void get_timezone_info( RTL_DYNAMIC_TIME_ZONE_INFORMATION *tzi )
+     time_t year_start, year_end, tmp, dlt = 0, std = 0;
+     int is_dst, bias;
+ 
+-    pthread_mutex_lock( &tz_mutex );
++    mutex_lock( &tz_mutex );
+ 
+     year_start = time(NULL);
+     tm = gmtime(&year_start);
+@@ -1939,7 +1939,7 @@ static void get_timezone_info( RTL_DYNAMIC_TIME_ZONE_INFORMATION *tzi )
+     if (current_year == tm->tm_year && current_bias == bias)
+     {
+         *tzi = cached_tzi;
+-        pthread_mutex_unlock( &tz_mutex );
++        mutex_unlock( &tz_mutex );
+         return;
+     }
+ 
+@@ -2032,7 +2032,7 @@ static void get_timezone_info( RTL_DYNAMIC_TIME_ZONE_INFORMATION *tzi )
+ 
+     find_reg_tz_info(tzi, tz_name, current_year + 1900);
+     cached_tzi = *tzi;
+-    pthread_mutex_unlock( &tz_mutex );
++    mutex_unlock( &tz_mutex );
+ }
+ 
+ 
+diff --git a/dlls/ntdll/unix/unix_private.h b/dlls/ntdll/unix/unix_private.h
+index 37c1e2ac016..c737a3a842f 100644
+--- a/dlls/ntdll/unix/unix_private.h
++++ b/dlls/ntdll/unix/unix_private.h
+@@ -278,6 +278,16 @@ static inline void *get_signal_stack(void)
+     return (char *)NtCurrentTeb() + teb_size - teb_offset;
+ }
+ 
++static inline void mutex_lock( pthread_mutex_t *mutex )
++{
++    pthread_mutex_lock( mutex );
++}
++
++static inline void mutex_unlock( pthread_mutex_t *mutex )
++{
++    pthread_mutex_unlock( mutex );
++}
++
+ #ifndef _WIN64
+ static inline TEB64 *NtCurrentTeb64(void) { return (TEB64 *)NtCurrentTeb()->GdiBatchCount; }
+ #endif
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 62b2ca1346a..336666c3582 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -2899,7 +2899,7 @@ NTSTATUS virtual_handle_fault( void *addr, DWORD err, void *stack )
+     char *page = ROUND_ADDR( addr, page_mask );
+     BYTE vprot;
+ 
+-    pthread_mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
++    mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
+     vprot = get_page_vprot( page );
+     if (!is_inside_signal_stack( stack ) && (vprot & VPROT_GUARD))
+     {
+@@ -2926,7 +2926,7 @@ NTSTATUS virtual_handle_fault( void *addr, DWORD err, void *stack )
+                 ret = STATUS_SUCCESS;
+         }
+     }
+-    pthread_mutex_unlock( &virtual_mutex );
++    mutex_unlock( &virtual_mutex );
+     return ret;
+ }
+ 
+@@ -2969,13 +2969,13 @@ void *virtual_setup_exception( void *stack_ptr, size_t size, EXCEPTION_RECORD *r
+     }
+     else if (stack < (char *)NtCurrentTeb()->Tib.StackLimit)
+     {
+-        pthread_mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
++        mutex_lock( &virtual_mutex );  /* no need for signal masking inside signal handler */
+         if ((get_page_vprot( stack ) & VPROT_GUARD) && grow_thread_stack( ROUND_ADDR( stack, page_mask )))
+         {
+             rec->ExceptionCode = STATUS_STACK_OVERFLOW;
+             rec->NumberParameters = 0;
+         }
+-        pthread_mutex_unlock( &virtual_mutex );
++        mutex_unlock( &virtual_mutex );
+     }
+ #if defined(VALGRIND_MAKE_MEM_UNDEFINED)
+     VALGRIND_MAKE_MEM_UNDEFINED( stack, size );
+-- 
+2.20.1
+

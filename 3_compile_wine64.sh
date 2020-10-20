@@ -37,6 +37,11 @@ if [ -z "${HAVE_TIMEOUT_PATCH}" ]; then
 fi
 echo "* Applying revert_d28c793.patch..."
 patch -p1 < "${WORKDIR}/patches/revert_d28c793.patch" || die "Cant apply the revert_d28c793.patch!"
+echo "* Applying debug patches..."
+patch -p1 < "${WORKDIR}/patches/tmp_debug_1.patch" || die "Cant apply the tmp_debug_1.patch!"
+patch -p1 < "${WORKDIR}/patches/tmp_debug_2.patch" || die "Cant apply the tmp_debug_2.patch!"
+patch -p1 < "${WORKDIR}/patches/tmp_debug_3.patch" || die "Cant apply the tmp_debug_3.patch!"
+patch -p1 < "${WORKDIR}/patches/tmp_debug_4.patch" || die "Cant apply the tmp_debug_4.patch!"
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 
 
