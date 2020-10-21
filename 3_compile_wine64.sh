@@ -40,8 +40,8 @@ cd "${WORKDIR}/wine-src" || die "Cant enter on ${WORKDIR}/wine-src dir!"
 #echo "* Applying debug patches..."
 #patch -p1 < "${WORKDIR}/patches/tmp_debug_1.patch" || die "Cant apply the tmp_debug_1.patch!"
 #patch -p1 < "${WORKDIR}/patches/tmp_debug_2.patch" || die "Cant apply the tmp_debug_2.patch!"
-#patch -p1 < "${WORKDIR}/patches/tmp_debug_3.patch" || die "Cant apply the tmp_debug_3.patch!"
-#patch -p1 < "${WORKDIR}/patches/tmp_debug_4.patch" || die "Cant apply the tmp_debug_4.patch!"
+patch -p1 < "${WORKDIR}/patches/tmp_debug_3.patch" || die "Cant apply the tmp_debug_3.patch!"
+patch -p1 < "${WORKDIR}/patches/tmp_debug_4.patch" || die "Cant apply the tmp_debug_4.patch!"
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 
 
