@@ -1,13 +1,78 @@
-diff --git a/dlls/user32/rawinput.c b/dlls/user32/rawinput.c
-index ba11a121bc5..4095ec6e68a 100644
---- a/dlls/user32/rawinput.c
-+++ b/dlls/user32/rawinput.c
-@@ -742,7 +742,7 @@ UINT WINAPI GetRawInputDeviceInfoW(HANDLE handle, UINT command, void *data, UINT
-     return *data_size;
+diff --git a/dlls/gdi.exe16/gdi.c b/dlls/gdi.exe16/gdi.c
+index 9afa4532fde..a42cba527fb 100644
+--- a/dlls/gdi.exe16/gdi.c
++++ b/dlls/gdi.exe16/gdi.c
+@@ -476,7 +476,7 @@ static void *CDECL dib_surface_get_bitmap_info( struct window_surface *window_su
+ /***********************************************************************
+  *           dib_surface_get_bounds
+  */
+-static RECT *CDECL dib_surface_get_bounds( struct window_surface *window_surface )
++static RECT *dib_surface_get_bounds( struct window_surface *window_surface )
+ {
+     struct dib_window_surface *surface = get_dib_surface( window_surface );
+ 
+diff --git a/dlls/user32/win.c b/dlls/user32/win.c
+index 680defc2071..6ca00e0284a 100644
+--- a/dlls/user32/win.c
++++ b/dlls/user32/win.c
+@@ -556,7 +556,7 @@ static void *CDECL dummy_surface_get_bitmap_info( struct window_surface *window_
+     return &dummy_data;
  }
  
--static int __cdecl compare_raw_input_devices(const void *ap, const void *bp)
-+static int compare_raw_input_devices(const void *ap, const void *bp)
+-static RECT *CDECL dummy_surface_get_bounds( struct window_surface *window_surface )
++static RECT *dummy_surface_get_bounds( struct window_surface *window_surface )
  {
-     const RAWINPUTDEVICE a = *(const RAWINPUTDEVICE *)ap;
-     const RAWINPUTDEVICE b = *(const RAWINPUTDEVICE *)bp;
+     static RECT dummy_bounds;
+     return &dummy_bounds;
+diff --git a/dlls/wineandroid.drv/window.c b/dlls/wineandroid.drv/window.c
+index 79bc471a984..9135401099f 100644
+--- a/dlls/wineandroid.drv/window.c
++++ b/dlls/wineandroid.drv/window.c
+@@ -687,7 +687,7 @@ static void *CDECL android_surface_get_bitmap_info( struct window_surface *windo
+ /***********************************************************************
+  *           android_surface_get_bounds
+  */
+-static RECT *CDECL android_surface_get_bounds( struct window_surface *window_surface )
++static RECT *android_surface_get_bounds( struct window_surface *window_surface )
+ {
+     struct android_window_surface *surface = get_android_surface( window_surface );
+ 
+diff --git a/dlls/winemac.drv/surface.c b/dlls/winemac.drv/surface.c
+index 7be1b6850e0..8296b688b13 100644
+--- a/dlls/winemac.drv/surface.c
++++ b/dlls/winemac.drv/surface.c
+@@ -128,7 +128,7 @@ static void *CDECL macdrv_surface_get_bitmap_info(struct window_surface *window_
+ /***********************************************************************
+  *              macdrv_surface_get_bounds
+  */
+-static RECT *CDECL macdrv_surface_get_bounds(struct window_surface *window_surface)
++static RECT *macdrv_surface_get_bounds(struct window_surface *window_surface)
+ {
+     struct macdrv_window_surface *surface = get_mac_surface(window_surface);
+ 
+diff --git a/dlls/winex11.drv/bitblt.c b/dlls/winex11.drv/bitblt.c
+index fad183b0b01..a811881ab4b 100644
+--- a/dlls/winex11.drv/bitblt.c
++++ b/dlls/winex11.drv/bitblt.c
+@@ -1848,7 +1848,7 @@ static void *CDECL x11drv_surface_get_bitmap_info( struct window_surface *window
+ /***********************************************************************
+  *           x11drv_surface_get_bounds
+  */
+-static RECT *CDECL x11drv_surface_get_bounds( struct window_surface *window_surface )
++static RECT *x11drv_surface_get_bounds( struct window_surface *window_surface )
+ {
+     struct x11drv_window_surface *surface = get_x11_surface( window_surface );
+ 
+diff --git a/include/wine/gdi_driver.h b/include/wine/gdi_driver.h
+index 124bb41f7d9..442e345fdc8 100644
+--- a/include/wine/gdi_driver.h
++++ b/include/wine/gdi_driver.h
+@@ -239,7 +239,7 @@ struct window_surface_funcs
+     void  (CDECL *lock)( struct window_surface *surface );
+     void  (CDECL *unlock)( struct window_surface *surface );
+     void* (CDECL *get_info)( struct window_surface *surface, BITMAPINFO *info );
+-    RECT* (CDECL *get_bounds)( struct window_surface *surface );
++    RECT* (*get_bounds)( struct window_surface *surface );
+     void  (CDECL *set_region)( struct window_surface *surface, HRGN region );
+     void  (CDECL *flush)( struct window_surface *surface );
+     void  (CDECL *destroy)( struct window_surface *surface );
