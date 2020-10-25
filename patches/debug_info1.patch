@@ -1,0 +1,142 @@
+diff --git a/dlls/user32/desktop.c b/dlls/user32/desktop.c
+index f7ab99a38bf..2b7e52705d6 100644
+--- a/dlls/user32/desktop.c
++++ b/dlls/user32/desktop.c
+@@ -92,6 +92,7 @@ static void init_wallpaper( const WCHAR *wallpaper )
+  */
+ LRESULT WINAPI DesktopWndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam )
+ {
++    int value;
+     switch (message)
+     {
+     case WM_NCCREATE:
+@@ -106,10 +107,11 @@ LRESULT WINAPI DesktopWndProc( HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
+ 
+             if (GetAncestor( hwnd, GA_PARENT )) return FALSE;  /* refuse to create non-desktop window */
+ 
+-            swprintf( buffer, ARRAY_SIZE(buffer), L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
++            value = wprintf( buffer, ARRAY_SIZE(buffer), L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+                       guid->Data1, guid->Data2, guid->Data3,
+                       guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3],
+                       guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7] );
++            FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+             atom = GlobalAddAtomW( buffer );
+             SetPropW( hwnd, L"__wine_display_device_guid", ULongToHandle( atom ) );
+         }
+diff --git a/dlls/user32/sysparams.c b/dlls/user32/sysparams.c
+index d4640e0068e..54e264c3f2e 100644
+--- a/dlls/user32/sysparams.c
++++ b/dlls/user32/sysparams.c
+@@ -4087,6 +4087,7 @@ BOOL WINAPI EnumDisplayDevicesW( LPCWSTR device, DWORD index, DISPLAY_DEVICEW *i
+     DWORD type;
+     HKEY hkey;
+     BOOL ret = FALSE;
++    int value;
+ 
+     TRACE("%s %d %p %#x\n", debugstr_w( device ), index, info, flags);
+ 
+@@ -4096,7 +4097,8 @@ BOOL WINAPI EnumDisplayDevicesW( LPCWSTR device, DWORD index, DISPLAY_DEVICEW *i
+     /* Find adapter */
+     if (!device)
+     {
+-        swprintf( key_nameW, ARRAY_SIZE(key_nameW), L"\\Device\\Video%d", index );
++        value = swprintf( key_nameW, ARRAY_SIZE(key_nameW), L"\\Device\\Video%d", index );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+         size = sizeof(bufferW);
+         if (RegGetValueW( HKEY_LOCAL_MACHINE, L"HARDWARE\\DEVICEMAP\\VIDEO", key_nameW, RRF_RT_REG_SZ, NULL, bufferW, &size ))
+             goto done;
+@@ -4106,7 +4108,8 @@ BOOL WINAPI EnumDisplayDevicesW( LPCWSTR device, DWORD index, DISPLAY_DEVICEW *i
+             lstrcpyW( info->DeviceKey, bufferW );
+ 
+         /* DeviceName */
+-        swprintf( info->DeviceName, ARRAY_SIZE(info->DeviceName), L"\\\\.\\DISPLAY%d", index + 1 );
++        value = swprintf( info->DeviceName, ARRAY_SIZE(info->DeviceName), L"\\\\.\\DISPLAY%d", index + 1 );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+ 
+         /* Strip \Registry\Machine\ */
+         lstrcpyW( key_nameW, bufferW + 18 );
+@@ -4151,19 +4154,22 @@ BOOL WINAPI EnumDisplayDevicesW( LPCWSTR device, DWORD index, DISPLAY_DEVICEW *i
+             goto done;
+ 
+         adapter_index = wcstol( device + lstrlenW(L"\\\\.\\DISPLAY"), NULL, 10 );
+-        swprintf( key_nameW, ARRAY_SIZE(key_nameW), L"\\Device\\Video%d", adapter_index - 1 );
++        value = swprintf( key_nameW, ARRAY_SIZE(key_nameW), L"\\Device\\Video%d", adapter_index - 1 );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+ 
+         size = sizeof(bufferW);
+         if (RegGetValueW( HKEY_LOCAL_MACHINE, L"HARDWARE\\DEVICEMAP\\VIDEO", key_nameW, RRF_RT_REG_SZ, NULL, bufferW, &size ))
+             goto done;
+ 
+         /* DeviceName */
+-        swprintf( info->DeviceName, ARRAY_SIZE(info->DeviceName), L"\\\\.\\DISPLAY%d\\Monitor%d", adapter_index, index );
++        value = swprintf( info->DeviceName, ARRAY_SIZE(info->DeviceName), L"\\\\.\\DISPLAY%d\\Monitor%d", adapter_index, index );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+ 
+         /* Get monitor instance */
+         /* Strip \Registry\Machine\ first */
+         lstrcpyW( key_nameW, bufferW + 18 );
+-        swprintf( bufferW, ARRAY_SIZE(bufferW), L"MonitorID%d", index );
++        value = swprintf( bufferW, ARRAY_SIZE(bufferW), L"MonitorID%d", index );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+ 
+         size = sizeof(instanceW);
+         if (RegGetValueW( HKEY_CURRENT_CONFIG, key_nameW, bufferW, RRF_RT_REG_SZ, NULL, instanceW, &size ))
+diff --git a/dlls/user32/win.c b/dlls/user32/win.c
+index 680defc2071..e702eb14869 100644
+--- a/dlls/user32/win.c
++++ b/dlls/user32/win.c
+@@ -4043,6 +4043,7 @@ BOOL WINAPI UpdateLayeredWindow( HWND hwnd, HDC hdcDst, POINT *pptDst, SIZE *psi
+  */
+ BOOL WINAPI GetProcessDefaultLayout( DWORD *layout )
+ {
++    int value;
+     if (!layout)
+     {
+         SetLastError( ERROR_NOACCESS );
+@@ -4069,8 +4070,9 @@ BOOL WINAPI GetProcessDefaultLayout( DWORD *layout )
+                 if (LOWORD(languages[i]) == MAKELANGID( PRIMARYLANGID(user_lang), SUBLANG_NEUTRAL )) break;
+         if (i == len) i = 0;  /* default to the first one */
+ 
+-        swprintf( buffer, ARRAY_SIZE(buffer), L"\\StringFileInfo\\%04x%04x\\FileDescription",
++        value = swprintf( buffer, ARRAY_SIZE(buffer), L"\\StringFileInfo\\%04x%04x\\FileDescription",
+                   LOWORD(languages[i]), HIWORD(languages[i]) );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+         if (!VerQueryValueW( data, buffer, (void **)&str, &len )) goto done;
+         TRACE( "found description %s\n", debugstr_w( str ));
+         if (str[0] == 0x200e && str[1] == 0x200e) version_layout = LAYOUT_RTL;
+diff --git a/dlls/user32/winstation.c b/dlls/user32/winstation.c
+index 95a9eb85099..4e0dbbc7725 100644
+--- a/dlls/user32/winstation.c
++++ b/dlls/user32/winstation.c
+@@ -61,12 +61,14 @@ static HANDLE get_winstations_dir_handle(void)
+     WCHAR buffer[64];
+     UNICODE_STRING str;
+     OBJECT_ATTRIBUTES attr;
++    int value;
+ 
+     if (!handle)
+     {
+         HANDLE dir;
+ 
+-        swprintf( buffer, ARRAY_SIZE(buffer), L"\\Sessions\\%u\\Windows\\WindowStations", NtCurrentTeb()->Peb->SessionId );
++        value = swprintf( buffer, ARRAY_SIZE(buffer), L"\\Sessions\\%u\\Windows\\WindowStations", NtCurrentTeb()->Peb->SessionId );
++        FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+         RtlInitUnicodeString( &str, buffer );
+         InitializeObjectAttributes( &attr, &str, 0, 0, NULL );
+         NtOpenDirectoryObject( &dir, DIRECTORY_CREATE_OBJECT | DIRECTORY_TRAVERSE, &attr );
+@@ -82,12 +84,14 @@ static BOOL WINAPI winstation_default_name_once( INIT_ONCE *once, void *param, v
+ {
+     TOKEN_STATISTICS stats;
+     BOOL ret;
++    int value;
+ 
+     ret = GetTokenInformation( GetCurrentProcessToken(), TokenStatistics, &stats, sizeof(stats), NULL );
+     if (ret)
+-        swprintf( default_name, ARRAY_SIZE(default_name), L"Service-0x%x-%x$",
++        value = swprintf( default_name, ARRAY_SIZE(default_name), L"Service-0x%x-%x$",
+                   stats.AuthenticationId.HighPart, stats.AuthenticationId.LowPart );
+ 
++    FIXME("DANIEL DEBUG %s[%u] swprintf: %d", __FILE__, __LINE__, value);
+     return ret;
+ }
+ 
