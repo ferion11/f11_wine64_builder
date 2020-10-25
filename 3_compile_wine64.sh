@@ -43,7 +43,8 @@ cd "${WORKDIR}/wine-src" || die "Cant enter on ${WORKDIR}/wine-src dir!"
 #patch -p1 < "${WORKDIR}/patches/tmp_debug_3.patch" || die "Cant apply the tmp_debug_3.patch!"
 #patch -p1 < "${WORKDIR}/patches/tmp_debug_4.patch" || die "Cant apply the tmp_debug_4.patch!"
 #patch -p1 < "${WORKDIR}/patches/revert1_b16f552.patch" || die "Cant apply the revert1_b16f552.patch!"
-patch -p1 < "${WORKDIR}/patches/revert2_a404eb7.patch" || die "Cant apply the revert2_a404eb7.patch!"
+#patch -p1 < "${WORKDIR}/patches/revert2_a404eb7.patch" || die "Cant apply the revert2_a404eb7.patch!"
+patch -p1 < "${WORKDIR}/patches/dev1.patch" || die "Cant apply the dev1.patch!"
 cd "${WORKDIR}" || die "Cant enter on ${WORKDIR} dir!"
 
 

@@ -1,0 +1,13 @@
+diff --git a/dlls/user32/winstation.c b/dlls/user32/winstation.c
+index 95a9eb85099..5dff4db4f9d 100644
+--- a/dlls/user32/winstation.c
++++ b/dlls/user32/winstation.c
+@@ -96,7 +96,7 @@ static const WCHAR *get_winstation_default_name( void )
+     static INIT_ONCE once = INIT_ONCE_STATIC_INIT;
+     BOOL ret;
+ 
+-    ret = InitOnceExecuteOnce( &once, winstation_default_name_once, NULL, NULL );
++    ret = InitOnceExecuteOnce( &once, winstation_default_name_once, default_name, NULL );
+     return ret ? default_name : NULL;
+ }
+ 
