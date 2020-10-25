@@ -1,0 +1,13 @@
+diff --git a/dlls/user32/rawinput.c b/dlls/user32/rawinput.c
+index ba11a121bc5..4095ec6e68a 100644
+--- a/dlls/user32/rawinput.c
++++ b/dlls/user32/rawinput.c
+@@ -742,7 +742,7 @@ UINT WINAPI GetRawInputDeviceInfoW(HANDLE handle, UINT command, void *data, UINT
+     return *data_size;
+ }
+ 
+-static int __cdecl compare_raw_input_devices(const void *ap, const void *bp)
++static int compare_raw_input_devices(const void *ap, const void *bp)
+ {
+     const RAWINPUTDEVICE a = *(const RAWINPUTDEVICE *)ap;
+     const RAWINPUTDEVICE b = *(const RAWINPUTDEVICE *)bp;
