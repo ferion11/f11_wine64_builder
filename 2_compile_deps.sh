@@ -24,7 +24,7 @@ echo "* downloading Vulkan-Loader..."
 wget -q "https://github.com/KhronosGroup/Vulkan-Loader/archive/v${VULKAN_VERSION}.tar.gz" -O "Vulkan-Loader-${VULKAN_VERSION}.tar.gz"
 echo "* downloading SPIRV-Headers..."
 wget -q "https://github.com/KhronosGroup/SPIRV-Headers/archive/${SPIRV_VERSION}.tar.gz"  -O "SPIRV-Headers-${SPIRV_VERSION}.tar.gz"
-git clone --depth 1 https://github.com/HansKristian-Work/vkd3d-proton.git
+wget -q https://github.com/HansKristian-Work/vkd3d-proton/archive/3c54cf8ad69e0d1403bc4b7a6c37359872abcf82.tar.gz -O vkd3d-proton.tar.gz
 
 echo "* extracting..."
 tar xf "SDL2-${SDL2_VERSION}.tar.gz" || die "* extract tar.gz error!"
@@ -32,6 +32,8 @@ tar xf "FAudio-${FAUDIO_VERSION}.tar.gz" || die "* extract tar.gz error!"
 tar xf "Vulkan-Headers-${VULKAN_VERSION}.tar.gz" || die "* extract tar.gz error!"
 tar xf "Vulkan-Loader-${VULKAN_VERSION}.tar.gz" || die "* extract tar.gz error!"
 tar xf "SPIRV-Headers-${SPIRV_VERSION}.tar.gz" || die "* extract tar.gz error!"
+tar xf "vkd3d-proton.tar.gz" || die "* extract tar.gz error!"
+mv vkd3d-proton-3c54cf8ad69e0d1403bc4b7a6c37359872abcf82 vkd3d-proton
 
 build_and_install() {
 	echo "* Building and installing: $1"
